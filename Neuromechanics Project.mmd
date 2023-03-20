@@ -1,0 +1,157 @@
+<Document>
+<Version> 22 </Version>
+<JMadonnaVersion> 10.2.6 </JMadonnaVersion>
+<Bounds> 0 0 1244 847 </Bounds>
+<NotesEditor>
+<jeditorpane>
+<size>13</size><family>Lucida Grande</family>
+</jeditorpane>
+</NotesEditor>
+<jmadonna.EquationPanel>
+<DocPanel>
+</DocPanel>
+<jeditorpane>
+<size>12</size><family>Serif</family>;4th order Runge-Katta numerical integrator
+METHOD RK4
+
+STARTTIME = 0
+;.5 sec = 100 ms
+STOPTIME= 500
+;2x10^-4 = .0002
+DT = 0.01
+RENAME TIME = t
+
+;single Matsuoka oscillator
+;2 muscles
+
+;variables changed between conditions
+;-time delay
+
+;muscle
+dampingratio = .136
+
+;spring constant (N/rad)
+k=.4
+
+;muscle delay = .001 s = 1 ms
+m=1
+
+;reduction ratio
+p=.01
+
+theta'' = (bigT*p/inertia) -k*(theta - Q)^3 - (dampingratio*theta') 
+
+;(Kg cm^2)
+inertia = 14.7
+
+;theta represents the position of the hand relative to a neutral position
+;maximal supination (rad)
+INIT theta = 1.92
+INIT theta' = 0
+;starting position (rad)
+Q = -.175
+
+;Matsuoka oscillator
+
+;neuron self-inhibition (mV)
+B=2.5
+
+;mutual inhibition (mV)
+w=2.5
+
+;muscle gain
+;pronator
+Gp=5
+;supinator
+Gs=5
+
+;feedback gains (mV)
+h1=30
+h2=h1
+
+;tonic input (mV)
+c=5.06
+
+;beginning of signal to neuron 1 (s)
+t1=.6
+;beginning of signal to neuron 2 (s)
+t2=t1*3
+
+;torque
+Tp=Fp*Rp
+Ts=Fs*Rs
+bigT=Tp-Ts
+
+;moment arms (Rp/Rs)
+Rp= -30
+Rs= 0
+
+;average rates of discharge of a pair of mutually inhibitory pair of neurons
+;healthy
+x1'=(-x1-B*v1-w*y2-h1*max(O,0)-h2*max(O,0)+c)/t1
+INIT x1=0
+
+;basis model does not have negatives in front of min
+x2'=(-x2-B*v2-w*y1-h1*min(O,0)-h2*min(O,0)+c)/t1
+INIT x2=1
+
+;self-inhibitory control
+v1'=(y1_delayed-v1)/t2
+INIT v1=0
+v2'=(y2_delayed-v2)/t2
+INIT v2=0
+
+;outputs of the 1st and 2nd model
+;extensor muscle torque
+y1=max(x1,0)
+;flexor muscle torque
+y2=max(x2,0)
+
+;output of the Matsuoka oscillator
+;strength and directionality of the neuronal signal
+y=y1-y2
+
+y1_delayed=DELAY(y1,m)
+y2_delayed=DELAY(y2,m)
+
+;pronator torque
+;operating range of motion
+Fp=Gp*y1_delayed
+;supinator torque
+Fs=Gs*y2_delayed
+
+;from Liran
+O=IF (theta<gt>=1.725) THEN (1) ELSE IF (theta<lt>=-1.725) THEN (-1) ELSE (0)
+
+</jeditorpane>
+</jmadonna.EquationPanel>
+
+<imethod> rk4 </imethod>
+<jmadonna.ParameterPanel>
+<DocPanel>
+</DocPanel>
+<ParamSets>
+</ParamSets>
+</jmadonna.ParameterPanel>
+<jmadonna.MultiPanel>
+<DocPanel>
+</DocPanel>
+<DividerPercent> 1.0 </DividerPercent>
+<Orientation> -1 </Orientation>
+<idx> 0 </idx>
+<TabSplitter>
+<SelectedIndex> -1 </SelectedIndex>
+</TabSplitter>
+<idx> 1 </idx>
+<TabSplitter>
+<SelectedIndex> -1 </SelectedIndex>
+</TabSplitter>
+</jmadonna.MultiPanel>
+
+<ChemicalReactionDialog>
+<ShowRates> true </ShowRates>
+<ShowConsts> true </ShowConsts>
+<ShowInits> true </ShowInits>
+<ShowDiffs> true </ShowDiffs>
+</ChemicalReactionDialog>
+</Document>
